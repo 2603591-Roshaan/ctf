@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Nightshift CTF</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0f22;--panel:#141936;--panel-2:#1b2147;--line:#2b3366;
+  --text:#e8ebff;--muted:#959cd0;--cyan:#52e0ff;--pink:#ff5fa8;
+  --easy:#5fe3a1;--med:#ffc65c;--hard:#ff6b7d;--prac:#a99cff;
+  --on-accent:#06101c;--grid:rgba(82,224,255,.05);
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0c0f22;--panel:#141936;--panel-2:#1b2147;--line:#2b3366;
+    --text:#e8ebff;--muted:#959cd0;--cyan:#52e0ff;--pink:#ff5fa8;
+    --easy:#5fe3a1;--med:#ffc65c;--hard:#ff6b7d;--prac:#a99cff;
+    --on-accent:#06101c;--grid:rgba(82,224,255,.05);color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0c0f22;--panel:#141936;--panel-2:#1b2147;--line:#2b3366;
+  --text:#e8ebff;--muted:#959cd0;--cyan:#52e0ff;--pink:#ff5fa8;
+  --easy:#5fe3a1;--med:#ffc65c;--hard:#ff6b7d;--prac:#a99cff;
+  --on-accent:#06101c;--grid:rgba(82,224,255,.05);color-scheme:dark;
+}
+:root[data-theme="light"]{
+  --bg:#f2f3fb;--panel:#ffffff;--panel-2:#e8eaf8;--line:#cdd2ee;
+  --text:#161a3a;--muted:#555c8a;--cyan:#0072a3;--pink:#c0166a;
+  --easy:#137447;--med:#865600;--hard:#b0223a;--prac:#5b47c9;
+  --on-accent:#ffffff;--grid:rgba(0,114,163,.05);color-scheme:light;
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:400 1rem/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:32px 32px;min-height:100%;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+h1,h2,h3,.brand{font-family:"Chakra Petch","IBM Plex Sans",system-ui,sans-serif;line-height:1.15;margin:0}
+code,pre,.mono,input.flag{font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+a{color:var(--cyan)}
+img{max-width:100%}
+button,input,textarea,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.bar{max-width:1180px;margin:0 auto;display:flex;align-items:center;gap:1rem;padding:.7rem 1.25rem;flex-wrap:wrap}
+.brand{font-size:1.35rem;font-weight:700;text-decoration:none;color:var(--text);display:flex;align-items:center;gap:.5rem}
+.brand .mark{display:inline-grid;place-items:center;width:30px;height:30px;border:2px solid var(--cyan);color:var(--cyan);font-size:.95rem;transform:skewX(-8deg)}
+nav{display:flex;gap:.2rem;flex-wrap:wrap;margin-left:auto}
+nav a{color:var(--muted);text-decoration:none;padding:.4rem .7rem;border-radius:6px;font-weight:500}
+nav a:hover{color:var(--text)}
+nav a[aria-current="page"]{color:var(--text);background:var(--panel-2)}
+.who{display:flex;gap:.5rem;align-items:center}
+.chip{font-family:"JetBrains Mono",monospace;font-size:.8rem;padding:.25rem .6rem;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+.chip b{color:var(--cyan);font-weight:600}
+.iconbtn{background:none;font-size:.85rem;border:1px solid var(--line);border-radius:8px;padding:.35rem .55rem;cursor:pointer;color:var(--muted)}
+.iconbtn:hover{color:var(--text)}
+
+main{max-width:1180px;margin:0 auto;padding:2rem 1.25rem 4rem}
+section.view{display:none}
+section.view.active{display:block}
+
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.1rem;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--text);cursor:pointer;font-weight:600;text-decoration:none}
+.btn:hover{border-color:var(--cyan)}
+.btn.primary{background:var(--cyan);border-color:var(--cyan);color:var(--on-accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{padding:.4rem .75rem;font-size:.9rem}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr 1fr;gap:2.5rem;align-items:center;padding:2rem 0 3rem}
+.hero h1{font-size:clamp(2.4rem,5vw,3.9rem);font-weight:700;letter-spacing:-.01em}
+.hero h1 .glitch{position:relative;display:inline-block}
+.hero p.lede{color:var(--muted);font-size:1.15rem;max-width:34ch;margin:1.1rem 0 1.6rem}
+.cta{display:flex;gap:.75rem;flex-wrap:wrap}
+.term{background:#070914;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px rgba(82,224,255,.06),0 24px 60px -30px rgba(82,224,255,.45)}
+:root[data-theme="light"] .term{background:#121633}
+.term .top{display:flex;gap:6px;padding:.6rem .8rem;border-bottom:1px solid #1f2650}
+.term .top i{width:10px;height:10px;border-radius:50%;background:#2b3366}
+.term pre{margin:0;padding:1.1rem 1.2rem;min-height:250px;color:#cfd6ff;font-size:.92rem;line-height:1.75;white-space:pre-wrap;word-break:break-word}
+.term .p{color:#52e0ff}.term .o{color:#8f97c9}.term .f{color:#5fe3a1}
+.caret{display:inline-block;width:.6em;height:1.1em;background:#52e0ff;vertical-align:-.2em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+.cats{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-top:1rem}
+.cats div{background:var(--panel);padding:1.1rem}
+.cats h3{font-size:1.05rem;margin-bottom:.3rem}
+.cats p{margin:0;color:var(--muted);font-size:.92rem}
+.home-sec{margin-top:3rem}
+.home-sec h2{font-size:1.6rem;margin-bottom:.4rem}
+.home-sec > p{color:var(--muted);margin:0 0 1rem;max-width:62ch}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.steps div{border-left:3px solid var(--cyan);padding:.2rem 0 .2rem 1rem}
+.steps h3{font-size:1.05rem;margin-bottom:.25rem}
+.steps p{margin:0;color:var(--muted)}
+
+/* page head */
+.phead{display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.phead h1{font-size:clamp(2rem,4vw,2.8rem)}
+.phead p{color:var(--muted);margin:.4rem 0 0;max-width:60ch}
+
+/* auth */
+.auth{max-width:440px;margin:1rem auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:1.6rem}
+.tabs{display:grid;grid-template-columns:1fr 1fr;background:var(--panel-2);border-radius:9px;padding:4px;margin-bottom:1.3rem}
+.tabs button{background:none;border:0;padding:.55rem;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--panel);color:var(--text)}
+label{display:block;font-weight:500;margin:.9rem 0 .35rem;font-size:.95rem}
+.field{width:100%;padding:.65rem .8rem;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+.field:focus{border-color:var(--cyan);outline:none}
+.help{color:var(--muted);font-size:.85rem;margin-top:.3rem}
+.msg{margin-top:1rem;font-size:.95rem;min-height:1.4em}
+.msg.err{color:var(--hard)}.msg.ok{color:var(--easy)}
+.auth .btn{width:100%;justify-content:center;margin-top:1.2rem}
+.signed{text-align:center}
+.signed h2{font-size:1.5rem;margin-bottom:.4rem}
+
+/* board */
+.summary{display:flex;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.2rem;color:var(--muted)}
+.summary b{color:var(--text);font-family:"Chakra Petch",sans-serif;font-size:1.4rem;margin-right:.3rem}
+.board-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.board{display:grid;grid-template-columns:110px repeat(5,minmax(170px,1fr));min-width:960px}
+.board .hd{padding:1rem;border-bottom:1px solid var(--line);font-family:"Chakra Petch",sans-serif;font-weight:600;font-size:1.05rem}
+.board .hd small{display:block;color:var(--muted);font-family:"IBM Plex Sans",sans-serif;font-weight:400;font-size:.82rem}
+.board .lv{padding:1rem;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--line);font-weight:600}
+.board .lv span{font-family:"JetBrains Mono",monospace;font-size:.8rem;color:var(--muted);font-weight:400}
+.lv.easy{color:var(--easy)}.lv.medium{color:var(--med)}.lv.hard{color:var(--hard)}
+.cell{padding:.6rem}
+.board .row-line{grid-column:1/-1;height:1px;background:var(--line)}
+.tile{width:100%;height:100%;min-height:112px;text-align:left;background:var(--panel-2);border:1px solid transparent;border-radius:10px;padding:.85rem;cursor:pointer;display:flex;flex-direction:column;gap:.35rem;transition:border-color .15s,transform .15s}
+.tile:hover{border-color:var(--lvl);transform:translateY(-2px)}
+.tile .pts{font-family:"Chakra Petch",sans-serif;font-size:1.5rem;font-weight:700;color:var(--lvl)}
+.tile .t{font-weight:600}
+.tile.solved{background:transparent;border:1px dashed var(--lvl)}
+.tile.solved .pts::after{content:" ✓ solved";font-size:.8rem;font-family:"IBM Plex Sans",sans-serif;font-weight:600}
+.tile[data-level="easy"]{--lvl:var(--easy)}.tile[data-level="medium"]{--lvl:var(--med)}.tile[data-level="hard"]{--lvl:var(--hard)}.tile[data-level="practice"]{--lvl:var(--prac)}
+@media (prefers-reduced-motion:reduce){.tile,.tile:hover{transition:none;transform:none}.caret{animation:none}}
+
+/* practice */
+.prac-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:2rem;align-items:start}
+.lesson ol{padding-left:1.3rem;margin:0}
+.lesson li{margin-bottom:1.1rem}
+.lesson li h3{font-size:1.1rem;margin-bottom:.25rem}
+.lesson li p{margin:.2rem 0;color:var(--muted)}
+.prac-list{display:flex;flex-direction:column;gap:.8rem}
+.prac-list .tile{min-height:0}
+.toolbox{margin-top:1.5rem;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1.2rem}
+.toolbox h3{font-size:1.1rem;margin-bottom:.5rem}
+.toolbox ul{margin:0;padding-left:1.1rem;color:var(--muted)}
+.toolbox li{margin:.3rem 0}
+.toolbox li b{color:var(--text)}
+
+/* learn */
+.learn{display:grid;grid-template-columns:220px 1fr;gap:2.5rem;align-items:start}
+.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px);display:flex;flex-direction:column;gap:.2rem}
+.toc button{background:none;border:0;text-align:left;padding:.35rem .6rem;color:var(--muted);cursor:pointer;border-radius:6px}
+.toc button:hover{color:var(--text);background:var(--panel-2)}
+.prose{max-width:76ch}
+.prose h2{font-size:1.6rem;margin:2.2rem 0 .6rem}
+.prose h2:first-child{margin-top:0}
+.prose p,.prose li{color:color-mix(in srgb,var(--text) 86%,var(--muted))}
+.prose code{background:var(--panel-2);padding:.1em .35em;border-radius:4px;font-size:.9em}
+.prose pre,.chal pre{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:.85rem 1rem;overflow-x:auto;font-size:.85rem;line-height:1.55;margin:.8rem 0}
+.wu{border:1px solid var(--line);border-radius:10px;margin:.7rem 0;background:var(--panel)}
+.wu summary{cursor:pointer;padding:.85rem 1rem;display:flex;gap:.7rem;align-items:center;list-style:none;font-weight:600}
+.wu summary::-webkit-details-marker{display:none}
+.wu summary::before{content:"+";font-family:"JetBrains Mono",monospace;color:var(--cyan);width:1ch}
+.wu[open] summary::before{content:"−"}
+.wu .body{padding:0 1.1rem 1rem 2.6rem}
+.lvl-tag{font-family:"JetBrains Mono",monospace;font-size:.75rem;padding:.12rem .5rem;border-radius:999px;border:1px solid currentColor;font-weight:400}
+.lvl-tag.easy{color:var(--easy)}.lvl-tag.medium{color:var(--med)}.lvl-tag.hard{color:var(--hard)}.lvl-tag.practice{color:var(--prac)}
+.spoiler{margin-top:.6rem}
+.spoiler button{background:none;border:1px dashed var(--line);color:var(--muted);padding:.35rem .7rem;border-radius:6px;cursor:pointer}
+.spoiler code.answer{display:none}
+.spoiler.shown code.answer{display:inline}
+.spoiler.shown button{display:none}
+
+/* scoreboard */
+.scores{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.scores th,.scores td{padding:.8rem 1rem;text-align:left;border-bottom:1px solid var(--line)}
+.scores th{color:var(--muted);font-weight:500;font-size:.9rem}
+.scores td.rank{font-family:"Chakra Petch",sans-serif;font-weight:700;font-size:1.2rem;width:70px}
+.scores tr.top1 td.rank{color:var(--med)}.scores tr.top2 td.rank{color:#c9d1ff}.scores tr.top3 td.rank{color:#e3a06b}
+.scores tr.me td{background:color-mix(in srgb,var(--cyan) 10%,transparent)}
+.scores td.num{font-family:"JetBrains Mono",monospace}
+.you{font-size:.75rem;color:var(--cyan);margin-left:.4rem}
+.empty{padding:2rem;text-align:center;color:var(--muted);background:var(--panel);border:1px dashed var(--line);border-radius:12px}
+.src{color:var(--muted);font-size:.9rem;margin-top:.8rem}
+
+/* modal */
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--text);padding:0;width:min(720px,calc(100vw - 2rem));max-height:calc(100dvh - 2rem - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px))}
+dialog::backdrop{background:rgba(5,7,18,.7);backdrop-filter:blur(3px)}
+.chal{padding:1.5rem 1.6rem 1.6rem}
+.chal .meta{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-bottom:.6rem;color:var(--muted);font-size:.9rem}
+.chal h2{font-size:1.8rem;margin-bottom:.8rem}
+.chal .close{float:right;margin:-.4rem -.4rem 0 0}
+.chal .desc p{margin:.5rem 0}
+.widget{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:1rem;margin:1rem 0}
+.widget .row{display:flex;gap:.5rem;flex-wrap:wrap}
+.widget .row .field{flex:1;min-width:180px}
+.widget .out{margin-top:.6rem;font-family:"JetBrains Mono",monospace;font-size:.9rem;word-break:break-all}
+.hint{margin:1rem 0;border:1px solid var(--line);border-radius:8px}
+.hint summary{cursor:pointer;padding:.6rem .9rem;color:var(--med);font-weight:500}
+.hint p{margin:0;padding:0 .9rem .8rem;color:var(--muted)}
+.submit{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem}
+.submit input{flex:1;min-width:200px}
+.chal .foot{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:1rem;font-size:.9rem}
+.linkbtn{background:none;border:0;color:var(--cyan);cursor:pointer;text-decoration:underline;padding:0}
+
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 1.5rem);transform:translateX(-50%);background:var(--easy);color:#06101c;padding:.75rem 1.2rem;border-radius:10px;font-weight:600;z-index:50;display:none}
+.toast.show{display:block}
+
+@media (max-width:860px){
+  .hero,.prac-grid,.learn{grid-template-columns:1fr}
+  .cats{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr}
+  .toc{position:static;flex-direction:row;flex-wrap:wrap}
+  nav{margin-left:0;width:100%;order:3}
+}
+</style>
+</head>
+<body>
+<!-- practice flag: flag{view_source_is_your_friend} -->
+<header>
+  <div class="bar">
+    <a class="brand" href="#home"><span class="mark">NS</span>Nightshift CTF</a>
+    <nav aria-label="Main">
+      <a href="#home" data-route="home">Home</a>
+      <a href="#practice" data-route="practice">Practice</a>
+      <a href="#challenges" data-route="challenges">Challenges</a>
+      <a href="#learn" data-route="learn">How to solve</a>
+      <a href="#scoreboard" data-route="scoreboard">Scoreboard</a>
+    </nav>
+    <div class="who">
+      <span class="chip" id="whoChip"><a href="#login" style="text-decoration:none">Sign in</a></span>
+      <button class="iconbtn" id="themeBtn" >Light mode</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- HOME -->
+  <section class="view" id="view-home">
+    <div class="hero">
+      <div>
+        <h1>Capture the flag.<br>Learn by breaking things.</h1>
+        <p class="lede">Eighteen puzzles across cryptography, forensics, OSINT, web and reversing. Start in the practice room if you’ve never played before.</p>
+        <div class="cta">
+          <a class="btn primary" href="#practice">Start practising</a>
+          <a class="btn" href="#challenges">Open the board</a>
+        </div>
+      </div>
+      <div class="term" aria-label="Example terminal session">
+        <div class="top"><i></i><i></i><i></i></div>
+        <pre id="termOut"></pre>
+      </div>
+    </div>
+
+    <div class="cats">
+      <div><h3>Cryptography</h3><p>Decode, decrypt and break weak ciphers.</p></div>
+      <div><h3>Forensics</h3><p>Dig flags out of files, logs and images.</p></div>
+      <div><h3>OSINT</h3><p>Find answers using public information.</p></div>
+      <div><h3>Web</h3><p>Find what the browser trusts that it shouldn’t.</p></div>
+      <div><h3>Reverse &amp; misc</h3><p>Read code backwards and peel off layers.</p></div>
+    </div>
+
+    <div class="home-sec">
+      <h2>How it works</h2>
+      <p>Every challenge hides a flag that looks like <code class="mono">flag{something_here}</code>. Find it, paste it in, collect the points.</p>
+      <div class="steps">
+        <div><h3>Create an account</h3><p>Pick a handle. Your solves and score are saved to it.</p></div>
+        <div><h3>Solve and submit</h3><p>Easy is 100 points, medium 250, hard 500. Practice flags are worth 25.</p></div>
+        <div><h3>Climb the board</h3><p>The scoreboard ranks players by total points.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOGIN -->
+  <section class="view" id="view-login">
+    <div class="auth" id="authBox"></div>
+  </section>
+
+  <!-- PRACTICE -->
+  <section class="view" id="view-practice">
+    <div class="phead">
+      <div>
+        <h1>Practice room</h1>
+        <p>New to CTFs? Work through these three in order. Each one teaches a habit you’ll use on the real board.</p>
+      </div>
+    </div>
+    <div class="prac-grid">
+      <div class="lesson">
+        <ol>
+          <li><h3>Know what you’re looking for</h3><p>A flag is a string in the format <code class="mono">flag{...}</code>. Copy it exactly, braces included. Flags are case-sensitive.</p></li>
+          <li><h3>Recognise encodings</h3><p>Strings ending in <code class="mono">=</code> with letters, digits, <code class="mono">+</code> and <code class="mono">/</code> are usually Base64. Encoding isn’t encryption: anyone can reverse it.</p></li>
+          <li><h3>Look behind the page</h3><p>Websites carry more than you can see. Right-click and choose Inspect, or press F12, to read the HTML, comments and storage.</p></li>
+          <li><h3>Use hints, then write-ups</h3><p>Stuck for more than 15 minutes? Open the hint. Still stuck? The How to solve page walks through every challenge.</p></li>
+        </ol>
+      </div>
+      <div>
+        <div class="prac-list" id="pracList"></div>
+        <div class="toolbox">
+          <h3>Your starter toolkit</h3>
+          <ul>
+            <li><b>CyberChef</b> for decoding almost anything: <a href="https://gchq.github.io/CyberChef/" target="_blank" rel="noopener">gchq.github.io/CyberChef</a></li>
+            <li><b>Browser developer tools</b> (F12) for HTML, cookies and storage</li>
+            <li><b>A map and a search engine</b> for OSINT</li>
+            <li><b>strings, exiftool, xxd</b> on Linux or macOS for file forensics</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHALLENGES -->
+  <section class="view" id="view-challenges">
+    <div class="phead">
+      <div>
+        <h1>Challenge board</h1>
+        <p>Pick any tile. Harder rows are worth more. Sign in to save your solves.</p>
+      </div>
+    </div>
+    <div class="summary" id="summary"></div>
+    <div class="board-wrap"><div class="board" id="board"></div></div>
+  </section>
+
+  <!-- LEARN -->
+  <section class="view" id="view-learn">
+    <div class="phead">
+      <div>
+        <h1>How to solve</h1>
+        <p>The method behind every challenge on the board. Try first, then read. Final answers are hidden until you ask for them.</p>
+      </div>
+    </div>
+    <div class="learn">
+      <div class="toc" id="toc"></div>
+      <div class="prose" id="learnBody"></div>
+    </div>
+  </section>
+
+  <!-- SCOREBOARD -->
+  <section class="view" id="view-scoreboard">
+    <div class="phead">
+      <div>
+        <h1>Scoreboard</h1>
+        <p>Ranked by total points. Ties go to whoever got there first.</p>
+      </div>
+    </div>
+    <div id="scoreBody"></div>
+    <p class="src" id="scoreSrc"></p>
+  </section>
+</main>
+
+<dialog id="dlg"><div class="chal" id="chal"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const unshift=(arr,n)=>arr.map(c=>String.fromCharCode(c-n)).join("");
+
+/* ---------- theme ---------- */
+const themeBtn=$("#themeBtn");
+function applyTheme(t){document.documentElement.setAttribute("data-theme",t);store.set("ns_theme",t);themeBtn.textContent=t==="dark"?"Light mode":"Dark mode"}
+applyTheme(store.get("ns_theme","dark"));
+themeBtn.addEventListener("click",()=>applyTheme(document.documentElement.getAttribute("data-theme")==="dark"?"light":"dark"));
+
+/* ---------- data ---------- */
+const POINTS={practice:25,easy:100,medium:250,hard:500};
+const CATS=[
+  {id:"crypto",name:"Cryptography",sub:"Ciphers and encodings"},
+  {id:"forensics",name:"Forensics",sub:"Files, logs, images"},
+  {id:"osint",name:"OSINT",sub:"Open-source intel"},
+  {id:"web",name:"Web",sub:"Client-side trust"},
+  {id:"rev",name:"Reverse & misc",sub:"Code and layers"}
+];
+const HEX="3c363b3d2135343f0538232e3f05332905343f2c3f28053f34352f3d3227";
+const BIN="01100011 00110011 01101100 01110101 01100100 01001000 01110100 00110101 01100010 01101101 01111000 01111001 01011010 01010111 01011010 01100110 01011001 01101101 01000110 01100110 01100101 01010111 00110101 01110011 01100011 01101101 01010110 01101101 01100110 01010001 00111101 00111101";
+const JWT_GUEST="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiZ3Vlc3QiLCJyb2xlIjoidXNlciJ9.kX9d0Qm2bT7cV1sPq8yL3nR6wZ4aF5hJ0eUoI2tGc1M";
+
+const CH=[
+ /* practice */
+ {id:"p1",cat:"practice",level:"practice",title:"Your first flag",
+  body:`<p>Welcome. Every challenge ends with a flag. This one is free so you can try submitting.</p><p>The flag is <code class="mono">flag{hello_ctf}</code>. Copy it into the box below and press Submit flag.</p>`,
+  hint:"Copy the whole thing, including flag and both curly braces.",
+  hashes:["7f4a1a26132b8407e43566a38f50ae8673752d93df105ab73bde016b74f7649c"],
+  wu:`<p>Nothing to solve here: the point is learning the format. Flags are always <code>flag{...}</code>, are case-sensitive, and must be pasted exactly.</p>`,ans:"flag{hello_ctf}"},
+ {id:"p2",cat:"practice",level:"practice",title:"Base64 warm-up",
+  body:`<p>Someone left this string in a config file:</p><pre>ZmxhZ3t3ZWxjb21lX3RvX2I2NH0=</pre><p>Decode it.</p>`,
+  hint:"The trailing = is padding, a strong sign of Base64. Try CyberChef’s From Base64 recipe, or atob() in the browser console.",
+  hashes:["7c6fa8f898a3cc9a9af6aa1c2f63eb11e6083f7d55533955fa89d451452cd760"],
+  wu:`<p>Base64 turns bytes into 64 printable characters and pads the end with <code>=</code>. Open your browser console (F12, Console tab) and run:</p><pre>atob("ZmxhZ3t3ZWxjb21lX3RvX2I2NH0=")</pre><p>On Linux or macOS: <code>echo ZmxhZ3t3ZWxjb21lX3RvX2I2NH0= | base64 -d</code>.</p>`,ans:"flag{welcome_to_b64}"},
+ {id:"p3",cat:"practice",level:"practice",title:"Look closer",
+  body:`<p>This very website is hiding a practice flag. You won’t see it on screen.</p><p>Developers often leave notes for each other in HTML comments.</p>`,
+  hint:"Press F12 (or right-click, Inspect) and look near the top of the body element for a green comment.",
+  hashes:["13f0902326f8619b0478050515fd86b03a0ed125227f109b5d1188a914393c9b"],
+  wu:`<p>HTML comments look like <code>&lt;!-- like this --&gt;</code>. Browsers don’t display them, but they’re sent to every visitor. Open developer tools, go to the Elements (or Inspector) tab and expand <code>&lt;body&gt;</code>. The first child is a comment containing the flag. In real assessments, comments often leak internal paths, credentials or TODOs.</p>`,ans:"flag{view_source_is_your_friend}"},
+
+ /* crypto */
+ {id:"c1",cat:"crypto",level:"easy",title:"Thirteen steps",
+  body:`<p>An ancient forum post contains this message:</p><pre>synt{ebg13_vf_abg_rapelcgvba}</pre><p>The braces survived. The letters didn’t.</p>`,
+  hint:"Count how far 's' is from 'f' in the alphabet.",
+  hashes:["f88220851f00f229caffa2e06c33d7088bda50fe5489ca96fe8e0ccbd264b7cd"],
+  wu:`<p>We know the flag starts with <code>flag</code>, and the ciphertext starts with <code>synt</code>. f→s, l→y, a→n, g→t: every letter moved 13 places. That’s ROT13, a Caesar cipher with shift 13. Because the alphabet has 26 letters, applying ROT13 twice gives back the original, so just apply it again (CyberChef: ROT13).</p><p>Lesson: a known plaintext prefix like <code>flag{</code> lets you work out simple shifts instantly.</p>`,ans:"flag{rot13_is_not_encryption}"},
+ {id:"c2",cat:"crypto",level:"medium",title:"Monkey business",
+  body:`<p>This one uses a keyword, so a single shift won’t work:</p><pre>rznq{ockg_eotcmh_ckxrqfac_pcmy}</pre><p>The key is a six-letter animal that loves pressing buttons in server rooms.</p>`,
+  hint:"It’s a Vigenère cipher. Use the known start 'flag' to recover the first four letters of the key, then guess the rest.",
+  hashes:["b72a6f6e546d1e48364e98817abbea226300a828a8351e526f00dd95d6b5dd8d"],
+  wu:`<p>Vigenère shifts each letter by a different amount, taken from a repeating keyword. Non-letters are skipped and don’t use up key letters.</p><p>Known plaintext attack: subtract plaintext from ciphertext letter by letter. r−f = 12 (M), z−l = 14 (O), n−a = 13 (N), q−g = 10 (K). The key starts MONK, and the clue says six letters: MONKEY.</p><p>Decrypt with CyberChef’s Vigenère Decode and key <code>monkey</code>.</p><p>Lesson: repeating keys leak patterns, and a known prefix gives the key away.</p>`,ans:"flag{keys_repeat_patterns_leak}"},
+ {id:"c3",cat:"crypto",level:"hard",title:"Single-byte secrets",
+  body:`<p>We intercepted this hex blob. Our analyst thinks it was XORed with one secret byte.</p><pre>${HEX}</pre><p>There are only 256 possible keys.</p>`,
+  hint:"XOR the first byte (0x3c) with the letter 'f' (0x66) and see what key falls out. Or brute force all 256 keys.",
+  hashes:["05634f9f1e78040f728eaa984d14b3eae8b645b3410ebb4e87f7c6cf34647cd0"],
+  wu:`<p>XOR is its own inverse: if <code>c = p ⊕ k</code> then <code>p = c ⊕ k</code> and <code>k = c ⊕ p</code>. Since the flag starts with <code>f</code> (0x66) and the first byte is 0x3c, the key is 0x3c ⊕ 0x66 = <code>0x5a</code> (the letter Z).</p><p>In CyberChef: From Hex, then XOR with key <code>5a</code> (hex). Or use the XOR Brute Force operation with crib <code>flag</code>. In the browser console:</p><pre>"${HEX}".match(/../g).map(b=>String.fromCharCode(parseInt(b,16)^0x5a)).join("")</pre><p>Lesson: a one-byte key has 256 possibilities, which a computer checks in microseconds.</p>`,ans:"flag{one_byte_is_never_enough}"},
+
+ /* forensics */
+ {id:"f1",cat:"forensics",level:"easy",title:"Hex marks the spot",
+  body:`<p>Here’s the start of a suspicious image file, shown as a hex dump:</p><pre>00000000  89 50 4e 47 0d 0a 1a 0a 00 00 00 0d 49 48 44 52   |.PNG........IHDR|
+00000010  00 00 01 00 00 00 00 00 00 00 74 45 58 74 43 6f   |..........tEXtCo|
+00000020  6d 6d 65 6e 74 00 66 6c 61 67 7b 73 74 72 69 6e   |mment.flag{strin|
+00000030  67 73 5f 66 69 6e 64 73 5f 65 76 65 72 79 74 68   |gs_finds_everyth|
+00000040  69 6e 67 7d 00 00 49 44 41 54 78 9c ed            |ing}..IDATx..|</pre>`,
+  hint:"Ignore the hex columns. Read the text column on the right, across the line breaks.",
+  hashes:["199aed4339f9a2492ede8ce9b865c72d55c598eb6f13e993226c95532b2f1366"],
+  wu:`<p>A hex dump shows each byte as two hex digits, with a printable version on the right (dots stand for unprintable bytes). The first bytes <code>89 50 4E 47</code> are the PNG “magic number”. Further on, a <code>tEXt</code> chunk holds a Comment, and the flag is split across three rows of the text column.</p><p>With a real file, <code>strings image.png | grep flag</code> or <code>exiftool image.png</code> finds this in one command.</p>`,ans:"flag{strings_finds_everything}"},
+ {id:"f2",cat:"forensics",level:"medium",title:"Captured session",
+  body:`<p>An intrusion detection system logged this HTTP request:</p><pre>GET /dashboard HTTP/1.1
+Host: intranet.nightshift.local
+User-Agent: Mozilla/5.0 (X11; Linux x86_64)
+Accept: text/html
+Cookie: theme=dark; session=dXNlcj1ndWVzdCZub3RlPWZsYWd7Y29va2llc190ZWxsX3RhbGVzfQ%3D%3D
+Connection: keep-alive</pre><p>What was hidden in the session?</p>`,
+  hint:"%3D is URL encoding for one character. After fixing that, the value looks familiar.",
+  hashes:["bf4457ab0056fd7432388e6ee41725afba92b961aa3b5f976cdeeb06101d2220"],
+  wu:`<p>Two layers. First, URL decoding: <code>%3D</code> is <code>=</code>, so the value ends in <code>==</code>, which points to Base64. Second, Base64 decoding gives <code>user=guest&amp;note=flag{...}</code>.</p><p>CyberChef recipe: URL Decode, then From Base64.</p><p>Lesson: session cookies that are only encoded, not signed or encrypted, expose (and let attackers edit) their contents.</p>`,ans:"flag{cookies_tell_tales}"},
+ {id:"f3",cat:"forensics",level:"hard",title:"Dark on dark",
+  body:`<p>This image looks empty. It isn’t.</p><div id="stegoSlot"></div><p>Save it or inspect it however you like.</p>`,
+  hint:"The text is a very slightly different colour from the background. Push the brightness and contrast way up, or use a levels or bit-plane tool such as StegOnline.",
+  hashes:["4b3080283dd023ea00b8ee45d522e02eb6ce398d47b8b30b3eb3bf1686d99f51"],
+  wu:`<p>The text is drawn in a colour only a few values away from the background, which human eyes can’t separate. Computers can.</p><p>Quickest route: right-click the image, Inspect, and add this style to the <code>&lt;img&gt;</code> element:</p><pre>filter: brightness(6) contrast(8);</pre><p>Alternatively, save the image and open it in StegOnline or GIMP (Colours → Levels, drag the input range very narrow). The flag appears in plain text.</p><p>Lesson: “invisible” isn’t the same as absent. Always check colour levels and bit planes on suspicious images.</p>`,ans:"flag{contrast_reveals_all}"},
+
+ /* osint */
+ {id:"o1",cat:"osint",level:"easy",title:"Iron lady",
+  body:`<p>Identify the landmark:</p><ul><li>Wrought-iron lattice tower</li><li>Built for a World’s Fair in 1889</li><li>Critics of the time called it an eyesore</li></ul><p>Submit as <code class="mono">flag{name_in_lowercase}</code> with underscores for spaces, without the city.</p>`,
+  hint:"It’s in Paris. Two words.",
+  hashes:["a9189ce548beca1a4b425543a0672e5e82c9f4a024040b60df30004c87780a5b"],
+  wu:`<p>Searching the three clues together (“iron lattice tower 1889 world’s fair”) returns one answer immediately. Format it as two lowercase words joined by an underscore.</p><p>Lesson: OSINT starts with picking the most distinctive details and searching them together.</p>`,ans:"flag{eiffel_tower}"},
+ {id:"o2",cat:"osint",level:"medium",title:"The machine’s father",
+  body:`<p>Find the person behind these clues:</p><ul><li>Published “On Computable Numbers” in 1936</li><li>Worked at Bletchley Park during the Second World War</li><li>Proposed an “imitation game” to test machine intelligence</li></ul><p>Submit as <code class="mono">flag{firstname_lastname}</code>, lowercase.</p>`,
+  hint:"A test for AI is named after them.",
+  hashes:["e33fb31f9a61a36b54269d4eb9bf91c904d904941f6dd78c6d784d2a0a844deb"],
+  wu:`<p>Search the exact paper title in quotes. Academic citations, Bletchley Park’s own history pages and the “imitation game” (today called the Turing test) all point to the same mathematician.</p><p>Lesson: exact-phrase searches in quotes cut through noise fast.</p>`,ans:"flag{alan_turing}"},
+ {id:"o3",cat:"osint",level:"hard",title:"Coordinates",
+  body:`<p>A photo’s GPS metadata gave these coordinates:</p><pre>52.3811° N, 4.6373° E</pre><p>Which large church stands there? Submit its common local name as <code class="mono">flag{name_in_lowercase}</code> with underscores for spaces.</p>`,
+  hint:"Paste the coordinates into a map. You’ll land in a Dutch city’s main market square.",
+  hashes:["02a286ebcadc31d4327af29c03f33c803a79dc7218ddedb3edf2bb8514fa674d","32de5636f3da9e853145af2390ddb825f91b4c826e754876edd1c14da48bbc71","e33e168403d4236ce9b9b8c47edc8f68c0a698239ee44413f7cdeb1725de9863","ccd7894c6538d9a10e1837d0d2437f9451b6f2cec761bfe01bccda59000602aa"],
+  wu:`<p>Paste <code>52.3811, 4.6373</code> into any map service. The pin lands on the Grote Markt in Haarlem, the Netherlands, beside the Grote Kerk (also called St. Bavo’s). Accepted answers include <code>flag{grote_kerk}</code> and <code>flag{st_bavo}</code>.</p><p>Lesson: photo metadata (EXIF) often includes GPS. Running <code>exiftool</code> on images you share is a good privacy habit.</p>`,ans:"flag{grote_kerk}"},
+
+ /* web */
+ {id:"w1",cat:"web",level:"easy",title:"Trust issues",
+  body:`<p>The admin login below checks your password. Find a way in.</p><div class="widget"><div class="row"><input class="field mono" id="w1pw" placeholder="Admin password" aria-label="Admin password"><button class="btn small" id="w1go">Log in</button></div><div class="out" id="w1out"></div></div><p>The developer is proud of this code:</p><pre>function check(pw) {
+  return pw === atob("bTBuazN5X2J1czFuZXNz");
+}</pre>`,
+  hint:"The password is right there in the code, just Base64-encoded.",
+  hashes:["e04a0607fafd5e8952ec68c8121aab620b2986e34c173f6822edde0623539f6f"],
+  setup(){const go=()=>{const v=$("#w1pw").value;$("#w1out").textContent=v===atob("bTBuazN5X2J1czFuZXNz")?"Access granted: "+atob("ZmxhZ3tuZXZlcl90cnVzdF90aGVfY2xpZW50fQ=="):"Access denied.";};$("#w1go").addEventListener("click",go);$("#w1pw").addEventListener("keydown",e=>{if(e.key==="Enter")go()});},
+  wu:`<p>The check runs in your browser, so you can read it. Decode the string: <code>atob("bTBuazN5X2J1czFuZXNz")</code> gives the password <code>m0nk3y_bus1ness</code>. Enter it and the flag appears.</p><p>Lesson: anything sent to the browser, including passwords and checks in JavaScript, is visible to the user. Real authentication must happen on the server.</p>`,ans:"flag{never_trust_the_client}"},
+ {id:"w2",cat:"web",level:"medium",title:"Guest pass",
+  body:`<p>Only admins can open the panel. The site remembers your role in the browser.</p><div class="widget"><p class="mono" id="w2role" style="margin:0 0 .6rem"></p><button class="btn small" id="w2go">Open admin panel</button><div class="out" id="w2out"></div></div>`,
+  hint:"Developer tools → Application (Chrome) or Storage (Firefox) → Local Storage. Look for a key named ns_role.",
+  hashes:["9841968b4d31b989225ebaf465107aba99f2aa53e2a10b5dce6c17d600d67d85"],
+  setup(){let role=null;try{role=localStorage.getItem("ns_role");if(!role){localStorage.setItem("ns_role","guest");role="guest"}}catch(e){}
+    $("#w2role").textContent=role?"Current role: "+role:"Browser storage is blocked here. Try opening the page in its own tab.";
+    $("#w2go").addEventListener("click",()=>{let r=null;try{r=localStorage.getItem("ns_role")}catch(e){}$("#w2role").textContent="Current role: "+(r||"unknown");$("#w2out").textContent=r==="admin"?"Welcome, admin. "+atob("ZmxhZ3thZG1pbl9ieV9sb2NhbF9zdG9yYWdlfQ=="):"Admins only. You are “"+(r||"unknown")+"”.";});},
+  wu:`<p>The page stores <code>ns_role = guest</code> in Local Storage and trusts it. Open developer tools, find Local Storage for this page, double-click the value and change it to <code>admin</code>. Or run in the console:</p><pre>localStorage.setItem("ns_role", "admin")</pre><p>Click Open admin panel again.</p><p>Lesson: cookies and storage are user-controlled. Never decide permissions from values the client can edit.</p>`,ans:"flag{admin_by_local_storage}"},
+ {id:"w3",cat:"web",level:"hard",title:"Token of trust",
+  body:`<p>The API gives you this JSON Web Token when you log in as a guest:</p><pre style="white-space:pre-wrap;word-break:break-all">${JWT_GUEST}</pre><p>Send a token to the server below. Admins receive the flag.</p><div class="widget"><textarea class="field mono" id="w3tok" rows="3" aria-label="Token" placeholder="Paste a token"></textarea><div class="row" style="margin-top:.5rem"><button class="btn small" id="w3go">Send to server</button></div><div class="out" id="w3out"></div></div>`,
+  hint:"A JWT is three Base64URL parts: header, payload, signature. What happens if the header says the algorithm is none?",
+  hashes:["98cc580640fb0affe137576af8d04cd608be04064ddbf1ac1596cd8ffbb9d787"],
+  setup(){$("#w3tok").value=JWT_GUEST;
+    const b64u=s=>{s=s.replace(/-/g,"+").replace(/_/g,"/");while(s.length%4)s+="=";return atob(s)};
+    $("#w3go").addEventListener("click",()=>{const out=$("#w3out");const parts=$("#w3tok").value.trim().split(".");
+      if(parts.length!==3){out.textContent="400 Bad request: a token needs three parts separated by dots.";return}
+      let h,p;try{h=JSON.parse(b64u(parts[0]));p=JSON.parse(b64u(parts[1]))}catch(e){out.textContent="400 Bad request: couldn’t decode the header or payload.";return}
+      const alg=String(h.alg||"").toLowerCase();
+      if(alg==="none"){out.textContent=p.role==="admin"?"200 OK. Welcome, admin: "+unshift([107,113,102,108,128,102,113,108,100,115,116,115,106,100,114,106,102,115,120,100,115,116,100,121,119,122,120,121,130],5):"200 OK. Hello "+(p.user||"user")+". Nothing for you here.";return}
+      if(parts.join(".")===JWT_GUEST){out.textContent="200 OK. Hello guest. The admin area needs role admin.";return}
+      out.textContent="401 Unauthorised: signature doesn’t match.";});},
+  wu:`<p>Decode the parts (jwt.io or CyberChef’s JWT Decode). The header is <code>{"alg":"HS256","typ":"JWT"}</code> and the payload is <code>{"user":"guest","role":"user"}</code>.</p><p>Changing the role to admin breaks the signature. But this server honours <code>"alg":"none"</code>, meaning “no signature needed”. Build a new token:</p><pre>header:  {"alg":"none","typ":"JWT"}  → eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0
+payload: {"user":"guest","role":"admin"} → eyJ1c2VyIjoiZ3Vlc3QiLCJyb2xlIjoiYWRtaW4ifQ
+token:   header.payload.   (note the trailing dot, empty signature)</pre><p>Base64URL is Base64 with <code>-</code> and <code>_</code> instead of <code>+</code> and <code>/</code>, and no padding. Send it and the flag comes back.</p><p>Lesson: servers must fix the accepted algorithm and reject <code>none</code>.</p>`,ans:"flag{alg_none_means_no_trust}"},
+
+ /* reverse & misc */
+ {id:"r0",cat:"rev",level:"easy",title:"Backwards",
+  body:`<p>The flag checker contains this line:</p><pre>if (input.split("").reverse().join("") === "}galf_a_llits_si_sdrawkcab{galf") {
+  unlock();
+}</pre><p>What input unlocks it?</p>`,
+  hint:"The code reverses your input before comparing. So reverse the target.",
+  hashes:["d4f36c70d1e8b2288be4e4d33cf03e2894c2467b0b0e6d109598119729c835df"],
+  wu:`<p>Reversing is its own inverse. Read the target string right to left, or run in the console:</p><pre>"}galf_a_llits_si_sdrawkcab{galf".split("").reverse().join("")</pre><p>Lesson: reverse engineering is working out what transformation the code applies, then undoing it.</p>`,ans:"flag{backwards_is_still_a_flag}"},
+ {id:"r1",cat:"rev",level:"medium",title:"Shifty checker",
+  body:`<p>Reverse this function to find the only input that returns true:</p><pre>function check(input) {
+  const target = [105,111,100,106,126,117,104,121,104,117,118,104,98,
+                  119,107,104,98,118,107,108,105,119,128];
+  if (input.length !== target.length) return false;
+  for (let i = 0; i &lt; input.length; i++) {
+    if (input.charCodeAt(i) + 3 !== target[i]) return false;
+  }
+  return true;
+}</pre>`,
+  hint:"Each character code is increased by 3 before comparing. Subtract 3 from each number in the target, then convert to characters.",
+  hashes:["5c4673ee86ad71c2194765a94307a10a89bcabf93814f5c3ab2fd5d518b50528"],
+  wu:`<p>The function adds 3 to each character code of your input and compares it with <code>target</code>. Undo it by subtracting 3 and converting back to text:</p><pre>[105,111,100,106,126,117,104,121,104,117,118,104,98,119,107,104,98,118,107,108,105,119,128]
+  .map(n =&gt; String.fromCharCode(n - 3)).join("")</pre><p>105−3 = 102 = <code>f</code>, 111−3 = 108 = <code>l</code>, and so on.</p>`,ans:"flag{reverse_the_shift}"},
+ {id:"m1",cat:"rev",level:"hard",title:"Onion",
+  body:`<p>Three layers of wrapping. Peel them in the right order.</p><pre style="white-space:pre-wrap">${BIN}</pre>`,
+  hint:"Layer one is obvious: binary. What you get next ends in ==. The last layer is one you met on the crypto column.",
+  hashes:["b8f3b715ffc2d59edca540a03389a8998014e5c071b62a2051475a6f25f5486d"],
+  wu:`<p>Peel one layer at a time and look at what you get:</p><ol><li><b>Binary → text.</b> Each 8-bit group is one character. Result: <code>c3ludHt5bmxyZWZfYmFfeW5scmVmfQ==</code>.</li><li><b>Base64 → text.</b> Result: <code>synt{ynlref_ba_ynlref}</code>, which has the shape of a flag but scrambled letters.</li><li><b>ROT13.</b> “synt” is “flag” shifted 13. Apply ROT13 to finish.</li></ol><p>CyberChef recipe: From Binary, From Base64, ROT13. CyberChef’s Magic operation can often detect these layers automatically.</p>`,ans:"flag{layers_on_layers}"}
+];
+const byId=Object.fromEntries(CH.map(c=>[c.id,c]));
+
+/* ---------- crypto helpers ---------- */
+const enc=new TextEncoder();
+const toHex=buf=>[...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,"0")).join("");
+async function sha256(s){return toHex(await crypto.subtle.digest("SHA-256",enc.encode(s)))}
+async function pbkdf2(pw,saltHex){
+  const salt=new Uint8Array(saltHex.match(/../g).map(h=>parseInt(h,16)));
+  const key=await crypto.subtle.importKey("raw",enc.encode(pw),"PBKDF2",false,["deriveBits"]);
+  return toHex(await crypto.subtle.deriveBits({name:"PBKDF2",salt,iterations:120000,hash:"SHA-256"},key,256));
+}
+
+/* ---------- accounts ---------- */
+let accounts=store.get("ns_accounts",{});
+let session=store.get("ns_session",null);
+if(session&&!accounts[session])session=null;
+const me=()=>session?accounts[session]:null;
+const saveAccounts=()=>store.set("ns_accounts",accounts);
+const scoreOf=a=>Object.keys(a.solves||{}).reduce((s,id)=>s+(byId[id]?POINTS[byId[id].level]:0),0);
+const lastSolve=a=>Math.max(0,...Object.values(a.solves||{}));
+
+function renderWho(){
+  const a=me(),chip=$("#whoChip");
+  if(a){chip.innerHTML="";const s=document.createElement("span");s.textContent=a.handle+" ";const b=document.createElement("b");b.textContent=scoreOf(a)+" pts";chip.append(s,b)}
+  else chip.innerHTML='<a href="#login" style="text-decoration:none">Sign in</a>';
+}
+
+let authMode="signin";
+function renderAuth(){
+  const box=$("#authBox"),a=me();
+  if(a){
+    const solved=Object.keys(a.solves||{}).length;
+    box.innerHTML=`<div class="signed"><h2></h2><p class="help" style="font-size:1rem">${solved} of ${CH.length} solved, ${scoreOf(a)} points.</p><div class="cta" style="justify-content:center;margin-top:1.2rem"><a class="btn primary" href="#challenges">Go to the board</a><button class="btn" id="signOut">Sign out</button></div></div>`;
+    $("h2",box).textContent="Signed in as "+a.handle;
+    $("#signOut").addEventListener("click",()=>{session=null;store.set("ns_session",null);renderAll();toast("Signed out")});
+    return;
+  }
+  const up=authMode==="signup";
+  box.innerHTML=`<div class="tabs" role="tablist"><button role="tab" aria-selected="${!up}" data-m="signin">Sign in</button><button role="tab" aria-selected="${up}" data-m="signup">Create account</button></div>
+  <h2 style="font-size:1.5rem">${up?"Create your account":"Welcome back"}</h2>
+  <form id="authForm" novalidate>
+    <label for="aHandle">Handle</label>
+    <input class="field" id="aHandle" autocomplete="username" maxlength="20" required>
+    ${up?'<p class="help">3 to 20 characters: letters, numbers, _ or -. Shown on the scoreboard.</p>':""}
+    <label for="aPw">Password</label>
+    <input class="field" id="aPw" type="password" autocomplete="${up?"new-password":"current-password"}" required>
+    ${up?'<p class="help">At least 8 characters.</p><label for="aPw2">Confirm password</label><input class="field" id="aPw2" type="password" autocomplete="new-password" required>':""}
+    <button class="btn primary" type="submit">${up?"Create account":"Sign in"}</button>
+    <p class="msg" id="aMsg" role="alert"></p>
+  </form>
+  <p class="help" style="margin-top:1rem">Accounts are stored in this browser.</p>`;
+  box.querySelectorAll("[data-m]").forEach(b=>b.addEventListener("click",()=>{authMode=b.dataset.m;renderAuth()}));
+  $("#authForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const msg=$("#aMsg");msg.className="msg";
+    const handle=$("#aHandle").value.trim(),pw=$("#aPw").value,key=handle.toLowerCase();
+    if(up){
+      if(!/^[A-Za-z0-9_-]{3,20}$/.test(handle)){msg.className="msg err";msg.textContent="Use 3 to 20 letters, numbers, _ or -.";return}
+      if(accounts[key]){msg.className="msg err";msg.textContent="That handle is taken. Pick another, or sign in.";return}
+      if(pw.length<8){msg.className="msg err";msg.textContent="Password needs at least 8 characters.";return}
+      if(pw!==$("#aPw2").value){msg.className="msg err";msg.textContent="Passwords don’t match.";return}
+      const salt=toHex(crypto.getRandomValues(new Uint8Array(16)));
+      accounts[key]={handle,salt,hash:await pbkdf2(pw,salt),solves:{},created:Date.now()};
+      saveAccounts();session=key;store.set("ns_session",key);
+      toast("Account created. Welcome, "+handle);syncScore();renderAll();location.hash="#practice";
+    }else{
+      const a=accounts[key];
+      if(!a||await pbkdf2(pw,a.salt)!==a.hash){msg.className="msg err";msg.textContent="Handle or password is incorrect.";return}
+      session=key;store.set("ns_session",key);toast("Signed in as "+a.handle);syncScore();renderAll();location.hash="#challenges";
+    }
+  });
+}
+
+/* ---------- board ---------- */
+function tile(c){
+  const a=me(),solved=!!(a&&a.solves&&a.solves[c.id]);
+  const catName=c.cat==="practice"?"Practice":CATS.find(x=>x.id===c.cat).name;
+  return `<button class="tile${solved?" solved":""}" data-level="${c.level}" data-id="${c.id}" aria-label="${esc(c.title)}, ${esc(catName)}, ${c.level}, ${POINTS[c.level]} points${solved?", solved":""}"><span class="pts">${POINTS[c.level]}</span><span class="t">${esc(c.title)}</span></button>`;
+}
+function renderBoard(){
+  const levels=["easy","medium","hard"];
+  let h='<div class="hd"></div>'+CATS.map(c=>`<div class="hd">${esc(c.name)}<small>${esc(c.sub)}</small></div>`).join("");
+  levels.forEach(lv=>{
+    h+='<div class="row-line"></div>';
+    h+=`<div class="lv ${lv}">${lv[0].toUpperCase()+lv.slice(1)}<span>${POINTS[lv]} pts</span></div>`;
+    CATS.forEach(cat=>{const c=CH.find(x=>x.cat===cat.id&&x.level===lv);h+=`<div class="cell">${c?tile(c):""}</div>`});
+  });
+  $("#board").innerHTML=h;
+  $("#pracList").innerHTML=CH.filter(c=>c.level==="practice").map(tile).join("");
+  const a=me(),solved=a?Object.keys(a.solves||{}).length:0,total=CH.reduce((s,c)=>s+POINTS[c.level],0);
+  $("#summary").innerHTML=a?`<span><b>${scoreOf(a)}</b>of ${total} points</span><span><b>${solved}</b>of ${CH.length} solved</span>`:`<span>You’re browsing as a guest. <a href="#login">Sign in or create an account</a> to save solves.</span>`;
+}
+document.addEventListener("click",e=>{const t=e.target.closest(".tile");if(t)openChal(t.dataset.id)});
+
+/* ---------- challenge modal ---------- */
+const dlg=$("#dlg");
+function openChal(id){
+  const c=byId[id],a=me(),solved=!!(a&&a.solves[id]);
+  const catName=c.cat==="practice"?"Practice":CATS.find(x=>x.id===c.cat).name;
+  $("#chal").innerHTML=`<button class="iconbtn close" id="xBtn" aria-label="Close">✕</button>
+   <div class="meta"><span>${esc(catName)}</span><span class="lvl-tag ${c.level}">${c.level}</span><span>${POINTS[c.level]} pts</span></div>
+   <h2>${esc(c.title)}</h2>
+   <div class="desc">${c.body}</div>
+   <details class="hint"><summary>Show hint</summary><p>${esc(c.hint)}</p></details>
+   <form class="submit" id="flagForm"><input class="field flag" id="flagIn" placeholder="flag{...}" autocomplete="off" spellcheck="false" aria-label="Flag"><button class="btn primary" type="submit">Submit flag</button></form>
+   <p class="msg" id="flagMsg" role="status">${solved?"You’ve already solved this one.":""}</p>
+   <div class="foot"><button class="linkbtn" id="wuBtn" type="button">Stuck? Read the write-up</button>${a?"":'<a href="#login" id="loginLink">Sign in to save points</a>'}</div>`;
+  if(solved)$("#flagMsg").className="msg ok";
+  $("#xBtn").addEventListener("click",()=>dlg.close());
+  $("#wuBtn").addEventListener("click",()=>{dlg.close();location.hash="#learn";setTimeout(()=>{const el=document.getElementById("wu-"+id);if(el){el.open=true;el.scrollIntoView({behavior:"smooth",block:"start"})}},60)});
+  const ll=$("#loginLink");if(ll)ll.addEventListener("click",()=>dlg.close());
+  if(id==="f3")buildStego($("#stegoSlot"));
+  if(c.setup)c.setup();
+  $("#flagForm").addEventListener("submit",async e=>{
+    e.preventDefault();
+    const v=$("#flagIn").value.trim(),m=$("#flagMsg");
+    if(!v){m.className="msg err";m.textContent="Paste a flag first.";return}
+    const ok=c.hashes.includes(await sha256(v));
+    if(!ok){m.className="msg err";m.textContent=/^flag\{.*\}$/.test(v)?"Not this one. Check the spelling and capitals.":"Flags look like flag{...}. Include the braces.";return}
+    const acc=me();
+    if(!acc){m.className="msg ok";m.textContent="Correct! Sign in to keep the points.";return}
+    if(acc.solves[id]){m.className="msg ok";m.textContent="Correct, and already counted.";return}
+    acc.solves[id]=Date.now();saveAccounts();syncScore();renderAll();
+    m.className="msg ok";m.textContent="Correct! +"+POINTS[c.level]+" points.";
+    toast("Flag captured: +"+POINTS[c.level]);
+  });
+  dlg.showModal();
+  setTimeout(()=>$("#flagIn").focus(),0);
+}
+dlg.addEventListener("click",e=>{if(e.target===dlg)dlg.close()});
+
+function buildStego(slot){
+  const cv=document.createElement("canvas");cv.width=720;cv.height=220;
+  const g=cv.getContext("2d");g.fillStyle="#101327";g.fillRect(0,0,720,220);
+  for(let i=0;i<900;i++){g.fillStyle=Math.random()<.5?"#0f1226":"#111428";g.fillRect(Math.random()*720,Math.random()*220,2,2)}
+  g.fillStyle="#14172c";g.font="bold 34px 'JetBrains Mono', monospace";g.textAlign="center";
+  g.fillText(unshift([109,115,104,110,130,106,118,117,123,121,104,122,123,102,121,108,125,108,104,115,122,102,104,115,115,132],7),360,122);
+  const img=new Image();img.src=cv.toDataURL("image/png");img.alt="A dark, apparently empty rectangle";img.style.borderRadius="8px";img.style.display="block";img.style.width="100%";
+  slot.replaceChildren(img);
+}
+
+/* ---------- learn page ---------- */
+function renderLearn(){
+  const groups=[{id:"practice",name:"Practice"},...CATS];
+  $("#toc").innerHTML=[["basics","Basics"],["tools","Toolkit"],...groups.map(g=>["sec-"+g.id,g.name])].map(([id,n])=>`<button data-to="${id}">${esc(n)}</button>`).join("");
+  let h=`<h2 id="basics">How a CTF works</h2>
+  <p>Capture the flag competitions are security puzzles. Each challenge hides a secret string, the flag, and your job is to find it. On this site every flag has the form <code>flag{lowercase_words}</code>.</p>
+  <p>A reliable approach for any challenge:</p>
+  <ol><li>Read the description twice. Titles and wording are clues.</li><li>Identify what you’re looking at: an encoding, a file, a web page, a place, some code.</li><li>Use what you already know. The flag starts with <code>flag{</code>, which is often enough to crack a cipher.</li><li>Change one thing at a time and watch what happens.</li><li>Take notes, especially of things that didn’t work.</li></ol>
+  <h2 id="tools">Toolkit</h2>
+  <p><b>CyberChef</b> handles Base64, hex, binary, URL encoding, ROT13, XOR and Vigenère in your browser. Drag operations into a recipe and chain them.</p>
+  <p><b>Developer tools</b> (F12) show the page’s HTML, run JavaScript in the Console, and let you edit cookies and Local Storage.</p>
+  <p><b>Command line</b>: <code>strings</code> prints readable text in a file, <code>exiftool</code> shows metadata, <code>xxd</code> makes a hex dump, <code>base64 -d</code> decodes.</p>
+  <p><b>Maps and search engines</b> for OSINT. Use exact phrases in quotes and combine distinctive details.</p>`;
+  groups.forEach(g=>{
+    h+=`<h2 id="sec-${g.id}">${esc(g.name)}</h2>`;
+    CH.filter(c=>c.cat===g.id).sort((a,b)=>POINTS[a.level]-POINTS[b.level]).forEach(c=>{
+      h+=`<details class="wu" id="wu-${c.id}"><summary><span>${esc(c.title)}</span><span class="lvl-tag ${c.level}">${c.level}</span></summary><div class="body">${c.wu}<div class="spoiler"><button type="button">Reveal the flag</button> <code class="answer">${esc(c.ans)}</code></div></div></details>`;
+    });
+  });
+  $("#learnBody").innerHTML=h;
+  $("#toc").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{const el=document.getElementById(b.dataset.to);if(el)el.scrollIntoView({behavior:"smooth",block:"start"})}));
+  $("#learnBody").querySelectorAll(".spoiler button").forEach(b=>b.addEventListener("click",()=>b.parentElement.classList.add("shown")));
+}
+
+/* ---------- scoreboard ---------- */
+let globalRows=null,dbRef=null,uid=null,boardState="local";
+function renderScores(){
+  const a=me();
+  let rows,src;
+  if(globalRows){
+    rows=globalRows.map(r=>({handle:r.handle,score:r.score,solved:r.solved,t:r.updated,mine:r.id===uid}));
+    src="Live board, shared with everyone who opens this page.";
+  }else{
+    rows=Object.entries(accounts).map(([k,x])=>({handle:x.handle,score:scoreOf(x),solved:Object.keys(x.solves||{}).length,t:lastSolve(x)||x.created,mine:k===session}));
+    src=boardState==="loading"?"Connecting to the live board…":"Showing accounts on this device.";
+  }
+  rows=rows.filter(r=>r.handle).sort((x,y)=>y.score-x.score||(x.t||0)-(y.t||0));
+  $("#scoreSrc").textContent=src;
+  if(!rows.length){$("#scoreBody").innerHTML=`<div class="empty"><p>No one has scored yet.</p><a class="btn primary" href="${a?"#practice":"#login"}">${a?"Solve your first flag":"Create an account"}</a></div>`;return}
+  const tb=document.createElement("table");tb.className="scores";
+  tb.innerHTML="<thead><tr><th>Rank</th><th>Player</th><th>Solved</th><th>Points</th></tr></thead>";
+  const body=document.createElement("tbody");
+  rows.forEach((r,i)=>{
+    const tr=document.createElement("tr");if(i<3)tr.className="top"+(i+1);if(r.mine)tr.classList.add("me");
+    const td=(t,cls)=>{const d=document.createElement("td");if(cls)d.className=cls;d.textContent=t;return d};
+    const name=td(r.handle);if(r.mine){const y=document.createElement("span");y.className="you";y.textContent="you";name.append(y)}
+    tr.append(td(String(i+1),"rank"),name,td(String(r.solved)+" / "+CH.length,"num"),td(String(r.score),"num"));
+    body.append(tr);
+  });
+  tb.append(body);$("#scoreBody").replaceChildren(tb);
+}
+async function syncScore(){
+  const a=me();if(!dbRef||!uid||!a)return;
+  try{await dbRef.doc("players/"+uid).set({handle:a.handle,score:scoreOf(a),solved:Object.keys(a.solves||{}).length,updated:lastSolve(a)||Date.now()})}catch(e){}
+}
+async function connect(){
+  const C=window.claude;if(!C||typeof C.use!=="function")return;
+  boardState="loading";renderScores();
+  const timer=setTimeout(()=>{if(!globalRows){boardState="local";renderScores()}},10000);
+  try{
+    const [user,db]=await Promise.all([C.use("user"),C.use("db")]);
+    if(!db){clearTimeout(timer);boardState="local";renderScores();return}
+    dbRef=db;uid=user?await user.id():null;
+    db.collection("players").orderBy("score","desc").limit(200).onSnapshot(snap=>{
+      clearTimeout(timer);
+      globalRows=snap.docs.filter(d=>d.exists).map(d=>{const x=d.data()||{};return{id:d.id,handle:String(x.handle||"").slice(0,20),score:Number(x.score)||0,solved:Number(x.solved)||0,updated:Number(x.updated)||0}});
+      boardState="live";renderScores();
+    },()=>{clearTimeout(timer);boardState="local";renderScores()});
+    syncScore();
+  }catch(e){clearTimeout(timer);boardState="local";renderScores()}
+}
+
+/* ---------- router ---------- */
+const ROUTES=["home","login","practice","challenges","learn","scoreboard"];
+function route(){
+  const r=(location.hash||"#home").slice(1);const v=ROUTES.includes(r)?r:"home";
+  document.querySelectorAll("section.view").forEach(s=>s.classList.toggle("active",s.id==="view-"+v));
+  document.querySelectorAll("nav a").forEach(a=>{if(a.dataset.route===v)a.setAttribute("aria-current","page");else a.removeAttribute("aria-current")});
+  if(dlg.open)dlg.close();
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",route);
+
+/* ---------- misc ---------- */
+let tt;function toast(t){const el=$("#toast");el.textContent=t;el.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>el.classList.remove("show"),2600)}
+function renderAll(){renderWho();renderAuth();renderBoard();renderScores()}
+
+function typeTerm(){
+  const out=$("#termOut");
+  const lines=[["p","$ nc nightshift.ctf 1337"],["o","Connected. 18 challenges online, 5 categories."],["p","$ echo aGVsbG8sIGhhY2tlcg== | base64 -d"],["f","hello, hacker"],["p","$ cat ./next_step.txt"],["o","Open the practice room. Find your first flag."]];
+  const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const html=n=>lines.slice(0,n).map(([c,t])=>`<span class="${c}">${esc(t)}</span>`).join("\n");
+  if(reduce){out.innerHTML=html(lines.length)+'\n<span class="p">$ </span><span class="caret"></span>';return}
+  let li=0,ci=0;
+  (function step(){
+    if(li>=lines.length){out.innerHTML=html(lines.length)+'\n<span class="p">$ </span><span class="caret"></span>';return}
+    const [c,t]=lines[li];
+    if(c!=="p"){li++;out.innerHTML=html(li)+'<span class="caret"></span>';setTimeout(step,350);return}
+    ci++;out.innerHTML=html(li)+(li?"\n":"")+`<span class="p">${esc(t.slice(0,ci))}</span><span class="caret"></span>`;
+    if(ci>=t.length){li++;ci=0;setTimeout(step,420)}else setTimeout(step,32);
+  })();
+}
+
+renderAll();renderLearn();route();typeTerm();connect();
+})();
+</script>
+</body>
+</html>

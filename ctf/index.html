@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>CyberAcademy — Learn Cybersecurity &amp; Secure Coding</title>
+  <meta name="description" content="A hands-on cybersecurity learning platform featuring Kurumi Tokisaki as official mascot, structured courses, guided lessons, and simulated sandbox labs.">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Hidden practice flag for source inspection -->
+  <!-- practice flag: flag{view_source_is_your_friend} -->
+
+  <!-- Top Navigation Header -->
+  <header class="site-header">
+    <div class="header-bar">
+      <a class="brand" href="#home" title="CyberAcademy — Guided by Kurumi Tokisaki">
+        <div class="brand-icon" id="brandMascotIcon">
+          <!-- Mini Kurumi Avatar -->
+          <span style="font-size:1.15rem;">🕰️</span>
+        </div>
+        <span>Cyber<span style="color:var(--accent-primary)">Academy</span></span>
+      </a>
+
+      <nav class="main-nav" id="mainNav">
+        <a href="#home" data-route="home" class="active">Home</a>
+        <a href="#rooms" data-route="rooms">Courses</a>
+        <a href="#challenges" data-route="challenges">All Labs</a>
+        <a href="#terminal" data-route="terminal">Terminal Lab</a>
+        <a href="#scoreboard" data-route="scoreboard">Leaderboard</a>
+        <a href="#learn" data-route="learn">Study Notes</a>
+        <a href="#profile" data-route="profile">My Portfolio</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="btn small primary" id="kurumiTourBtn" title="Let Kurumi float across icons and guide you through the platform">🧭 Tour Guide</button>
+        <button class="btn small" id="openToolsBtn" title="Open Cyber Toolbelt">🧰 Tools</button>
+        <button class="icon-btn" id="audioToggleBtn" title="Toggle Sound">🔊</button>
+        <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme">🌓</button>
+        <div class="user-chip" id="userHeaderChip" title="View Student Profile">
+          <span id="userChipAvatar">👤</span>
+          <span id="userChipHandle">student_novice</span>
+          <span class="pts" id="userChipPoints">0 XP</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Viewports Router -->
+  <main class="site-main">
+
+    <!-- VIEW: HOME -->
+    <section class="view-section active" id="view-home">
+      <div class="hero-grid">
+        <div>
+          <div class="academy-pill">🕰️ Companion: Kurumi Tokisaki &bull; Beginner Friendly</div>
+          <h1 class="hero-title">Master cyber defense.<br><span class="glow-text">Learn by practicing</span> in guided labs.</h1>
+          <p class="hero-lead">Step into real-world cybersecurity concepts without complicated setup. Learn web application security, threat investigation, cryptography, forensics, and Linux system administration through hands-on lessons with Kurumi Tokisaki as your academic companion.</p>
+          <div class="d-flex gap-2 flex-wrap">
+            <a class="btn primary" href="#rooms">Explore Courses &rarr;</a>
+            <button class="btn ghost" id="heroStartTourBtn" type="button" onclick="if(window.KurumiMascot&&window.KurumiMascot.startTour)window.KurumiMascot.startTour('academy');">🧭 Tour with Kurumi</button>
+            <a class="btn" href="#challenges">Browse All Labs</a>
+            <a class="btn ghost" href="#terminal">Terminal Playground</a>
+          </div>
+        </div>
+        <div>
+          <!-- Hero Terminal Simulation -->
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot red"></span>
+                <span class="dot yellow"></span>
+                <span class="dot green"></span>
+              </div>
+              <div class="terminal-title">student-session.sh</div>
+            </div>
+            <div class="terminal-body" style="min-height:220px; font-size:0.85rem;" id="heroTermOut">
+              <span class="term-user">student@cyber-academy</span>:<span class="term-path">~</span>$ ./check_curriculum.sh<br>
+              <span style="color:var(--color-success)">[✓] 6 Guided Courses loaded (Web Security, OSINT, Crypto, Forensics, Linux).</span><br>
+              <span class="text-muted">[*] 24 interactive lessons and hands-on laboratory exercises available.</span><br>
+              <span class="term-user">student@cyber-academy</span>:<span class="term-path">~</span>$ echo "ZmxhZ3t3ZWxjb21lX3RvX2I2NH0=" | base64 -d<br>
+              <span style="color:var(--beige-gold)">flag{welcome_to_b64}</span><br>
+              <span class="term-user">student@cyber-academy</span>:<span class="term-path">~</span>$ cat curriculum_philosophy.txt<br>
+              <span>"Every security flaw is a lesson in how software can be built better and defended stronger."</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kurumi Mascot Welcome Card -->
+      <div id="kurumiHeroCard"></div>
+
+      <!-- Quick Platform Stats -->
+      <div class="hero-stats-row">
+        <div class="stat-card">
+          <div class="stat-val" id="stat-challenges-count">24</div>
+          <div class="stat-label">Guided Lessons &amp; Labs</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-points-count">3,400+</div>
+          <div class="stat-label">Total Learning XP</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val">6</div>
+          <div class="stat-label">Structured Courses</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val" id="stat-solves-count">0</div>
+          <div class="stat-label">Completed Labs</div>
+        </div>
+      </div>
+
+      <!-- Learning Methodology Banner -->
+      <div class="callout concept mb-4">
+        <h4>🏛️ The CyberAcademy Learning Approach:</h4>
+        <div class="d-flex gap-3 flex-wrap mt-2">
+          <div style="flex:1; min-width:240px;">
+            <b>1. Understand the Theory</b>
+            <p style="font-size:0.88rem; color:var(--text-muted);">Each module explains the core computer science principles and architectural assumptions behind the vulnerability.</p>
+          </div>
+          <div style="flex:1; min-width:240px;">
+            <b>2. Hands-on Practice</b>
+            <p style="font-size:0.88rem; color:var(--text-muted);">Interact with live simulated web forms, Wireshark packet captures, SQL visualizers, and Linux bash terminals.</p>
+          </div>
+          <div style="flex:1; min-width:240px;">
+            <b>3. Defensive Engineering</b>
+            <p style="font-size:0.88rem; color:var(--text-muted);">Learn how developers and security engineers remediate and prevent vulnerabilities in production code.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Course Curriculum Highlights -->
+      <div class="mt-4">
+        <h2>Curriculum Courses &amp; Modules</h2>
+        <p class="text-muted">Structured learning tracks from security fundamentals to advanced vulnerability analysis.</p>
+        <div class="rooms-grid mt-2" id="homeRoomsPreview"></div>
+      </div>
+    </section>
+
+    <!-- VIEW: COURSES / ROOMS -->
+    <section class="view-section" id="view-rooms">
+      <div class="page-head">
+        <div>
+          <h1>Curriculum Courses</h1>
+          <p>Choose a learning track to build your cybersecurity knowledge step-by-step. Each module includes guided lessons, interactive labs, and defensive best practices.</p>
+        </div>
+      </div>
+      <!-- Kurumi Course Companion Card -->
+      <div id="kurumiCoursesCard" class="mb-3"></div>
+      <div class="rooms-grid" id="roomsListGrid"></div>
+    </section>
+
+    <!-- VIEW: ALL LABS -->
+    <section class="view-section" id="view-challenges">
+      <div class="page-head">
+        <div>
+          <h1>Interactive Labs Library</h1>
+          <p>Hands-on sandbox exercises. Click any lesson to view the theoretical concept, launch the simulated target, and verify your lab completion.</p>
+        </div>
+        <div class="d-flex align-center gap-2">
+          <span class="text-muted" id="boardSummaryText">0 / 24 Completed &bull; 0 XP</span>
+        </div>
+      </div>
+
+      <!-- Category Filter Tabs -->
+      <div class="board-filters" id="boardFilters">
+        <button class="filter-btn active" data-filter="all">All Labs</button>
+        <button class="filter-btn" data-filter="practice">🎯 Module 1: Fundamentals</button>
+        <button class="filter-btn" data-filter="web">🌐 Module 2: Web Security</button>
+        <button class="filter-btn" data-filter="osint">🔍 Module 3: OSINT &amp; Recon</button>
+        <button class="filter-btn" data-filter="crypto">🔐 Module 4: Cryptography</button>
+        <button class="filter-btn" data-filter="forensics">🔬 Module 5: Forensics</button>
+        <button class="filter-btn" data-filter="terminal">💻 Module 6: Linux CLI</button>
+        <button class="filter-btn" data-filter="unsolved">⏳ Incomplete Labs</button>
+      </div>
+
+      <!-- Challenges/Labs Grid -->
+      <div class="challenges-grid" id="challengesGrid"></div>
+    </section>
+
+    <!-- VIEW: INTERACTIVE TERMINAL -->
+    <section class="view-section" id="view-terminal">
+      <div class="page-head">
+        <div>
+          <h1>Linux Terminal Playground</h1>
+          <p>A full virtual bash sandbox running directly in your browser. Practice file exploration, inspection of dotfiles, and log analysis without installing any software.</p>
+        </div>
+        <button class="btn small" id="termQuickHelpBtn">Quick Commands Reference</button>
+      </div>
+      <!-- Kurumi Terminal Companion Note -->
+      <div id="kurumiTerminalCard" class="mb-3"></div>
+      <div id="main-terminal-container"></div>
+    </section>
+
+    <!-- VIEW: SCOREBOARD / LEADERBOARD -->
+    <section class="view-section" id="view-scoreboard">
+      <div class="page-head">
+        <div>
+          <h1>Class Leaderboard</h1>
+          <p>Track your learning progress and XP against other students. Completed labs and XP are automatically saved to your profile.</p>
+        </div>
+      </div>
+      <div id="kurumiLeaderboardCard" class="mb-3"></div>
+      <div style="overflow-x:auto;">
+        <table class="scoreboard-table">
+          <thead>
+            <tr>
+              <th style="width:80px;">Rank</th>
+              <th>Student</th>
+              <th>Skill Level</th>
+              <th>Labs Completed</th>
+              <th>Learning XP</th>
+            </tr>
+          </thead>
+          <tbody id="scoreboardBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- VIEW: STUDY NOTES / LEARN -->
+    <section class="view-section" id="view-learn">
+      <div class="page-head">
+        <div>
+          <h1>Course Notes &amp; Defense Manual</h1>
+          <p>Structured reference notes, vulnerability causes, and code-level remediation steps for students reviewing concepts.</p>
+        </div>
+      </div>
+      <div id="guideContent"></div>
+    </section>
+
+    <!-- VIEW: STUDENT PORTFOLIO / PROFILE -->
+    <section class="view-section" id="view-profile">
+      <div class="page-head">
+        <div>
+          <h1>Student Learning Portfolio</h1>
+          <p>Review your earned skill certificates, track course completion rates, and export your learning progress backup.</p>
+        </div>
+      </div>
+      <div class="profile-grid">
+        <!-- Profile Card -->
+        <div class="profile-card">
+          <div class="profile-avatar-large" id="profAvatar">🎓</div>
+          <h2 id="profHandle">student_novice</h2>
+          <div class="rank-pill" id="profRank">Security Apprentice</div>
+          <div class="mb-3">
+            <div class="d-flex justify-between text-muted" style="font-size:0.85rem; margin-bottom:0.3rem;">
+              <span>Curriculum Progress</span>
+              <span id="profProgressPct">0%</span>
+            </div>
+            <div class="room-progress-bar">
+              <div class="room-progress-fill" id="profProgressBar" style="width:0%;"></div>
+            </div>
+          </div>
+          <div class="d-flex justify-between text-left text-muted mb-3" style="font-size:0.9rem;">
+            <span>Earned XP: <b style="color:var(--beige-gold)" id="profScore">0 XP</b></span>
+            <span>Completed: <b style="color:var(--color-success)" id="profSolved">0 / 24</b></span>
+          </div>
+
+          <!-- Kurumi Portfolio Comment -->
+          <div id="kurumiProfileCard" class="mb-3"></div>
+
+          <!-- Edit Handle Form -->
+          <form id="profileForm" class="text-left mt-3">
+            <label style="font-size:0.85rem; font-weight:600; display:block; margin-bottom:0.4rem;">Student Name / Handle</label>
+            <input type="text" id="profHandleInput" class="form-input mb-2" maxlength="20">
+            <button type="submit" class="btn primary small" style="width:100%;">Update Profile</button>
+          </form>
+
+          <!-- Export / Import / Reset -->
+          <div class="mt-4 pt-3" style="border-top:1px solid var(--border-color);">
+            <div class="d-flex gap-1 justify-center flex-wrap">
+              <button class="btn small" id="exportProgressBtn" title="Download backup JSON">💾 Export</button>
+              <button class="btn small" id="importProgressBtn" title="Restore from JSON">📂 Import</button>
+              <button class="btn small" id="resetProgressBtn" style="color:var(--color-danger);" title="Clear saved progress">⚠️ Reset</button>
+              <input type="file" id="importFileInput" accept=".json" style="display:none;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Badges & Achievements Showcase -->
+        <div>
+          <h2>Earned Skill Badges &amp; Certifications</h2>
+          <p class="text-muted">Earn verified skill badges as you complete courses and master offensive and defensive concepts.</p>
+          <div class="achievements-grid" id="achievementsGrid"></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Guided Lesson & Lab Modal Dialog -->
+  <dialog id="chal-dialog" class="chal-dialog">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div>
+          <div class="d-flex gap-1 align-center flex-wrap mb-1" id="chalMetaBadges"></div>
+          <h2 id="chalTitle">Lesson Title</h2>
+        </div>
+        <div class="d-flex gap-1 align-center">
+          <button class="btn tiny ghost" id="chalTourBtn" type="button" title="Let Kurumi float across this lab's tabs & icons" onclick="if(window.KurumiMascot&&window.KurumiMascot.startTour)window.KurumiMascot.startTour('lab');">🧭 Tour Lab</button>
+          <button class="icon-btn" id="chalCloseBtn" aria-label="Close dialog">✕</button>
+        </div>
+      </div>
+
+      <!-- Kurumi Modal Companion Speech Box & Live Step Guide -->
+      <div class="kurumi-modal-companion" id="kurumiModalCompanion">
+        <div class="kurumi-modal-companion-avatar" id="kurumiModalAvatar"></div>
+        <div class="kurumi-modal-companion-content">
+          <div class="kurumi-modal-companion-header">
+            <span class="kurumi-guide-step-badge" id="kurumiGuideStepBadge">🕰️ Step 1 of 4: Threat Concept</span>
+            <span class="kurumi-guide-status-tag" id="kurumiGuideStatusTag">📖 Reading Theory</span>
+          </div>
+          <p class="kurumi-modal-companion-text" id="kurumiModalText">Ara ara, welcome to this lesson. Let us understand the security concept together.</p>
+          <div class="kurumi-modal-companion-actions" id="kurumiModalActions">
+            <button class="btn tiny primary" id="kurumiGuideNextBtn" type="button">Next Step 🐾</button>
+            <button class="btn tiny ghost" id="kurumiGuideExplainBtn" type="button">Guide Me 💡</button>
+            <button class="btn tiny ghost" id="kurumiGuideFocusBtn" type="button">Highlight Sandbox 🎯</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Educational Lesson Navigation Tabs -->
+      <div class="lesson-tabs" role="tablist">
+        <button class="lesson-tab-btn active" data-tab="concept">📖 1. Concept &amp; Theory</button>
+        <button class="lesson-tab-btn" data-tab="lab">🧪 2. Guided Lab</button>
+        <button class="lesson-tab-btn" data-tab="defense">🛡️ 3. How to Defend</button>
+        <button class="lesson-tab-btn" data-tab="check">🏁 4. Lab Check</button>
+      </div>
+
+      <!-- TAB 1: Concept & Theory -->
+      <div class="lesson-tab-content active" id="tabContent-concept">
+        <div id="chalConceptBody"></div>
+        <div class="callout realworld mt-3" id="chalRealWorldBody"></div>
+        <div class="mt-3 text-right">
+          <button class="btn primary small" onclick="window.App.switchLessonTab('lab')">Proceed to Guided Lab &rarr;</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: Interactive Lab Target -->
+      <div class="lesson-tab-content" id="tabContent-lab">
+        <div class="callout guide" id="chalLabGuideBody"></div>
+        <div id="chalBody" class="mb-3"></div>
+
+        <!-- Hint Accordion -->
+        <details class="hint-box" id="chalHintDetails">
+          <summary>💡 Need an instructor hint?</summary>
+          <div class="hint-content" id="chalHintText"></div>
+        </details>
+        
+        <div class="d-flex justify-between align-center mt-3">
+          <button class="btn ghost small" onclick="window.App.switchLessonTab('concept')">&larr; Back to Theory</button>
+          <button class="btn primary small" onclick="window.App.switchLessonTab('check')">Submit Lab Flag &rarr;</button>
+        </div>
+      </div>
+
+      <!-- TAB 3: Defensive Remediation -->
+      <div class="lesson-tab-content" id="tabContent-defense">
+        <div class="callout defense" id="chalDefenseBody"></div>
+        <div class="mt-3 text-right">
+          <button class="btn primary small" onclick="window.App.switchLessonTab('check')">Go to Lab Check &rarr;</button>
+        </div>
+      </div>
+
+      <!-- TAB 4: Lab Completion Check -->
+      <div class="lesson-tab-content" id="tabContent-check">
+        <div class="callout concept mb-3">
+          <h4>🏁 Lab Completion Verification</h4>
+          <p>Once you discover the secret flag token in the lab target, paste it below to record your completion and earn course XP.</p>
+        </div>
+
+        <form class="flag-form" id="flagSubmitForm">
+          <input type="text" class="form-input flag-input" id="flagInput" placeholder="flag{...}" autocomplete="off" spellcheck="false" required>
+          <button type="submit" class="btn primary">Verify Completion</button>
+        </form>
+        <div id="flagFeedbackMsg" class="status-msg mt-2" style="display:none;"></div>
+
+        <div class="d-flex justify-between align-center mt-3 pt-2 text-muted" style="font-size:0.85rem; border-top:1px solid var(--border-color);">
+          <button type="button" class="btn ghost small" id="chalGuideLink">📖 View Course Study Notes</button>
+          <span id="chalSolveStatusText"></span>
+        </div>
+      </div>
+
+    </div>
+  </dialog>
+
+  <!-- Cyber Toolbelt Dialog -->
+  <dialog id="tools-dialog" class="chal-dialog" style="max-width:680px;">
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div>
+          <div class="badge medium mb-1">🛠️ Offline Cyber Toolbelt</div>
+          <h2>Encoder, Decoder &amp; Hash Analyzer</h2>
+        </div>
+        <button class="icon-btn" id="toolsCloseBtn">✕</button>
+      </div>
+
+      <div class="form-group mb-2">
+        <label style="font-weight:600; font-size:0.88rem; display:block; margin-bottom:0.3rem;">Input Text or Ciphertext:</label>
+        <textarea id="toolInputText" class="form-input mono" rows="3" placeholder="Paste Base64, Hex, Binary, ROT13, or Hash here..."></textarea>
+      </div>
+
+      <div class="d-flex gap-1 flex-wrap mb-3">
+        <button class="btn small" id="toolB64Dec">Base64 Decode</button>
+        <button class="btn small" id="toolB64Enc">Base64 Encode</button>
+        <button class="btn small" id="toolHexDec">Hex Decode</button>
+        <button class="btn small" id="toolHexEnc">Hex Encode</button>
+        <button class="btn small" id="toolRot13">ROT13</button>
+        <button class="btn small" id="toolUrlDec">URL Decode</button>
+        <button class="btn small" id="toolIdentify">🔍 Identify Format</button>
+        <button class="btn small" id="toolHashSha256">SHA-256</button>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:600; font-size:0.88rem; display:block; margin-bottom:0.3rem;">Output Result:</label>
+        <div id="toolOutputResult" class="code-banner text-left" style="min-height:70px; white-space:pre-wrap;">Output will appear here...</div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Application Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/tools.js"></script>
+  <script src="js/mascot.js"></script>
+  <script src="js/challenges.js"></script>
+  <script src="js/terminal.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
